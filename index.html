@@ -1266,11 +1266,13 @@ function buildCards(){
     if (!card || card.classList.contains('sc-locked')) return;
     const idx = card.dataset.stageIdx;
     if (idx !== undefined) {
+      Sound.se('next');
       if(Save.getTutOn()) showTutorial(Number(idx));
       else startGame(Number(idx));
       return;
     }
     if (card.dataset.endless === '1') {
+      Sound.se('next');
       if(Save.getTutOn()) showEndlessTutorial();
       else startEndless();
     }
@@ -1345,6 +1347,7 @@ function buildCards(){
       Save.setTutOn(next);
       sw.classList.toggle('on',next);
       stateEl.textContent=next?'ON':'OFF';
+      Sound.se('toggle');
     };
     sw.addEventListener('click',e=>{e.stopPropagation();toggleFn();});
     sw.addEventListener('touchend',e=>{e.preventDefault();e.stopPropagation();toggleFn();},{passive:false});
@@ -1469,12 +1472,15 @@ function advanceEndlessTut() {
   ol.addEventListener('click', e => {
     const tag = e.target.closest('.et-arrow');
     if(tag) return;
+    Sound.se('next');
     currentAdvance();
   });
   ol.addEventListener('touchend', e => {
     const tag = e.target.closest('.et-arrow');
     if(tag) return;
-    e.preventDefault(); currentAdvance();
+    e.preventDefault();
+    Sound.se('next');
+    currentAdvance();
   }, { passive: false });
 
   function wireArrow(id, fn){
@@ -1489,7 +1495,7 @@ function advanceEndlessTut() {
       if(etCurrentPage>0){ etCurrentPage--; renderEndlessTutPage(etCurrentPage); }
     }
   });
-  wireArrow('etNext', ()=>{ currentAdvance(); });
+  wireArrow('etNext', ()=>{ Sound.se('next'); currentAdvance(); });
 })();
 
 /* ─── ステージチュートリアルデータ ─── */
@@ -2082,6 +2088,7 @@ function showEndlessResult(){
     }
   }
 
+  Sound.se('endless_result');
   showScreen('endlessResult');
   requestAnimationFrame(()=>requestAnimationFrame(scaleResWrap));
   if(raf) cancelAnimationFrame(raf);
@@ -2260,7 +2267,7 @@ function updateEnemies(dt){
         gs.hp=Math.max(0,gs.hp-e.def.kcal);
         gs.damageTaken=(gs.damageTaken||0)+Math.max(0,e.def.kcal);
         addFloat(e.x,e.y,'‐'+e.def.kcal+'kcal','#f55');
-        doBurst(e.x,e.y,'#ff2200',14);doShake(12);flashDamage();
+        doBurst(e.x,e.y,'#ff2200',14);doShake(12);Sound.se('damage');flashDamage();
         enemies.splice(i,1);gs.combo=0;updateComboUI();
         if(gs.hp<=0&&gs.running)triggerGO();
         continue;
@@ -2927,8 +2934,8 @@ function wire(id,fn){const el=document.getElementById(id);if(!el)return;el.addEv
 wire('btnStart',        ()=>{ Sound.se('next'); showScreen('stage'); });
 wire('btnEndless',      ()=>startEndless());
 wire('btnBack',         ()=>{ Sound.se('back'); showScreen('title'); });
-wire('btnContinue',     resumeGame);
-wire('btnRetire',       retireGame);
+wire('btnContinue',     ()=>{ Sound.se('next'); resumeGame(); });
+wire('btnRetire',       ()=>{ Sound.se('back'); retireGame(); });
 wire('btnRetry',        ()=>{ Sound.se('next'); retryGame(); });
 wire('btnStage',        ()=>{ Sound.se('back'); if(raf)cancelAnimationFrame(raf);showScreen('stage'); });
 wire('ui-pause',        pauseGame);
