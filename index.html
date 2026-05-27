@@ -1710,8 +1710,8 @@ function closeTutorial(){
 
 (function(){
   const ol=document.getElementById('tutorialOverlay');
-  ol.addEventListener('click',closeTutorial);
-  ol.addEventListener('touchend',e=>{e.preventDefault();closeTutorial();},{passive:false});
+  ol.addEventListener('click',()=>{ Sound.se('next'); closeTutorial(); });
+  ol.addEventListener('touchend',e=>{e.preventDefault(); Sound.se('next'); closeTutorial();},{passive:false});
 })();
 
 function fmtTime(s){const m=Math.floor(s/60),ss=Math.floor(s%60);return`${m}:${ss<10?'0':''}${ss}`;}
